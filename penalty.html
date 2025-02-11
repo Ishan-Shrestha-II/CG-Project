@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Penalty Shooter Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: green;
+      text-align: center;
+    }
+    canvas {
+      display: block;
+      margin: 20px auto;
+      border: 2px solid white;
+      background: black;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="color: white;">Penalty Shooter Game</h2>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    var canvas = document.getElementById("gameCanvas");
+    var context = canvas.getContext("2d");
+    var playerX = 400;
+    var ballX = 400;
+    var ballY = 550;
+    var ballMoving = false;
+    var goalkeeperX = 350;
+    var goalkeeperSpeed = 3;
+    var goalkeeperDirection = 1;
+    var goals = 0;
+    var misses = 0;
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "ArrowLeft") {
+        playerX -= 20;
+        if (!ballMoving) {
+          ballX -= 20;
+        }
+      }
+      if (event.key === "ArrowRight") {
+        playerX += 20;
+        if (!ballMoving) {
+          ballX += 20;
+        }
+      }
+      if (event.key === " ") {
+        if (!ballMoving) {
+          ballMoving = true;
+        }
+      }
+    });
+
+    function update() {
+      goalkeeperX += goalkeeperSpeed * goalkeeperDirection;
+      if (goalkeeperX <= 100 || goalkeeperX + 100 >= 700) {
+        goalkeeperDirection *= -1;
+      }
+
+      if (ballMoving) {
+        ballY -= 5;
+        if (ballY <= 120) {
+          if (ballX > goalkeeperX && ballX < goalkeeperX + 100) {
+            misses++;
+            alert("Goalkeeper saved!");
+          } else {
+            goals++;
+            alert("Goal!");
+          }
+          ballY = 550;
+          ballX = playerX;
+          ballMoving = false;
+        }
+      }
+    }
+
+    function draw() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "gold";
+      context.fillRect(200, 50, 400, 20);
+      context.fillStyle = "red";
+      context.fillRect(goalkeeperX, 100, 100, 20);
+      context.fillStyle = "white";
+      context.beginPath();
+      context.arc(playerX, 550, 15, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "black";
+      context.beginPath();
+      context.arc(ballX, ballY, 10, 0, Math.PI * 2);
+      context.fill();
+      context.strokeStyle = "white";
+      context.stroke();
+      context.fillStyle = "white";
+      context.font = "20px Arial";
+      context.fillText("Goals: " + goals, 50, 30);
+      context.fillText("Misses: " + misses, 650, 30);
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  </script>
+</body>
+</html>
